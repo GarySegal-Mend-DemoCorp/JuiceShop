@@ -1,0 +1,47 @@
+name: Mend Reachability CLI Scan (Windows)
+
+on: workflow_dispatch
+
+jobs:
+  build-and-mend-scan:
+    runs-on: windows-latest 
+
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: [14.x, 16.x, 18.x]
+
+    - name: Build with npm
+      shell: pwsh 
+      run: npm install
+
+# The mend dep scan should be called AFTER a package manager build step such as "mvn clean install -DskipTests=true" or "npm install --only=prod"
+    - name: Mend CLI Download
+      env:
+        MEND_EMAIL: ${{secrets.MEND_EMAIL}}
+        MEND_USER_KEY: ${{secrets.MEND_USER_KEY}}
+        MEND_URL: https://saas.mend.io
+      run: |
+        echo '=== Downloading Mend CLI =='
+        curl https://downloads.mend.io/cli/windows_amd64/mend.exe -o mend.exe
+        echo '=== Mend CLI version: ==='
+        .\mend.exe version
+
+    - name: Mend CLI Scan
+      env:
+        MEND_EMAIL: ${{secrets.MEND_EMAIL}}
+        MEND_USER_KEY: ${{secrets.MEND_USER_KEY}}
+        MEND_URL: https://saas.mend.io
+      run: |
+        echo '=== Running Scan ==='
+        .\mend.exe dep -u --reachability-on
+      continue-on-error: true
+
+    - name: Mend CLI Logs
+      run: cat ~/.mend/logs/sca/*.log
+      continue-on-error: true
+
