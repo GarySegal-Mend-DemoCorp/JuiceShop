@@ -8,15 +8,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up JDK
-      uses: actions/setup-java@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
       with:
-        java-version: '11'
-        distribution: 'adopt'
-    - name: Build with Maven
+       node-version: 18.x
+    - name: Build with mpm
       run: |
-        mvn --version
-        mvn clean install -DskipTests=true
+        npm -v
+        npm install
 
 # The mend dep scan should be called AFTER a package manager build step such as "mvn clean install -DskipTests=true" or "npm install --only=prod"
     - name: Mend CLI Download
