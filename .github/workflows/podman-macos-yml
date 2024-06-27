@@ -1,0 +1,40 @@
+name: Podman Nginx on macOS
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  run-nginx:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Podman
+      run: |
+        brew install podman
+        brew install --cask podman-desktop
+
+    - name: init Podman
+      run: |
+        podman machine init
+
+    - name: rootful Podman
+      run: |
+        podman machine set --rootful
+
+    - name: start Podman
+      run: |
+        podman machine start
+
+    - name: Pull Nginx Image
+      run: |
+        podman pull nginx:latest
+
+    - name: check for images
+      run: |
+        docker images
