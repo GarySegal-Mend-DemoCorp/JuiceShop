@@ -19,9 +19,9 @@ jobs:
       run: |
         podman machine init
 
-    - name: rootful Podman
-      run: |
-        podman machine set --rootful
+   # - name: rootful Podman
+   #   run: |
+   #     podman machine set --rootful
 
     - name: start Podman
       run: |
